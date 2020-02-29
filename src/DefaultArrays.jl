@@ -31,6 +31,10 @@ module DefaultArrays
             throw(BoundsError)
         end
     end
+    @inline function getindex(A::DefaultArray,i::Int) 
+        I=CartesianIndices(A)[i]
+        A[I]
+    end
     @inline function Base.getindex(A::DefaultArray, I::Int...) 
         @boundscheck checkbounds(A,I)
         get(A.elements, I, A.default)

@@ -2,7 +2,7 @@ module DefaultArrays
     import Base.size
     import Base.getindex
     import Base.setindex!
-    export DefaultArray
+    export DefaultArray,eachnondefault
     struct DefaultArray{T,N} <: AbstractArray{T,N}
         default::T
         size::NTuple{N,Int}

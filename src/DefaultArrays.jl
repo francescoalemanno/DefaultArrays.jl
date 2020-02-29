@@ -35,7 +35,10 @@ module DefaultArrays
         @boundscheck checkbounds(A,I)
         get(A.elements, I, A.default)
     end
-
+    @inline function setindex!(A::DefaultArray,v,i::Int) 
+        I=CartesianIndices(A)[i]
+        A[I]=v
+    end
     @inline function Base.setindex!(A::DefaultArray, v, I::Int...) 
         @boundscheck checkbounds(A,I)
         if v == A.default
@@ -43,6 +46,10 @@ module DefaultArrays
             return A[I...]
         end
         A.elements[I] = v
+    end
+
+    function eachnondefault(A::DefaultArray)
+        (CartesianIndex(x) for x in keys(A.elements) if A.elements[x]!=A.default)
     end
 
 end # module

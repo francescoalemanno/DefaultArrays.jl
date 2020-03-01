@@ -31,18 +31,18 @@ module DefaultArrays
             throw(BoundsError)
         end
     end
-    @inline function getindex(A::DefaultArray,i::Int) 
-        I=CartesianIndices(A)[i]
-        A[I]
-    end
+    #@inline function getindex(A::DefaultArray,i::Int) #FIXME
+    #    I=CartesianIndices(A)[i]
+    #    A[I]
+    #end
     @inline function Base.getindex(A::DefaultArray, I::Int...) 
         @boundscheck checkbounds(A,I)
         get(A.elements, I, A.default)
     end
-    @inline function setindex!(A::DefaultArray,v,i::Int) 
-        I=CartesianIndices(A)[i]
-        A[I]=v
-    end
+    #@inline function setindex!(A::DefaultArray,v,i::Int) #FIXME
+    #    I=CartesianIndices(A)[i]
+    #    A[I]=v
+    #end
     @inline function Base.setindex!(A::DefaultArray, v, I::Int...) 
         @boundscheck checkbounds(A,I)
         if v == A.default

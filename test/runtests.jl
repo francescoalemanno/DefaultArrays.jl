@@ -33,4 +33,5 @@ end
     Q=M[2:3,2:3].+I(2)
     @test all(Q.==[1.0 2.0; 2.0 3.0])
     @test typeof(M)==DefaultArray{Float64,2}
+    @test all((DefaultArray(0.0,2,2).+true).==1)
 end

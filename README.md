@@ -1,4 +1,7 @@
 # DefaultArrays
+
+[![Build Status](https://travis-ci.org/francescoalemanno/DefaultArrays.jl.svg?branch=master)](https://travis-ci.org/francescoalemanno/DefaultArrays.jl)
+
 Julia array type supporting a default value, useful for storing very sparse information in a space efficient manner, the internal design uses "Dict" for storage
 
 ### Installation:

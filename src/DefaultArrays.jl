@@ -60,11 +60,12 @@ module DefaultArrays
 
 
     @inline BroadcastStyle(::Type{<:DefaultArray{T}}) where {T} = Broadcast.ArrayStyle{DefaultArray{T}}()
+
     function similar(bc::Broadcast.Broadcasted{Broadcast.ArrayStyle{DefaultArray{T}}}, ::Type{ElType}) where {ElType,T}
         da = find_defaultarray(bc)
         va,_ =promote(da.default,zero(ElType))
         gooddefault=ifelse(typeof(va)==ElType, va, zero(ElType))
-        return DefaultArray(gooddefault::ElType,similar(Array{ElType}, axes(bc)))
+        return DefaultArray(gooddefault::ElType,size(bc))
     end
 
 

@@ -3,17 +3,21 @@ module DefaultArrays
     import Base.getindex
     import Base.setindex!
     import Base.@propagate_inbounds
+    import Base.IndexStyle
+    import Base.BroadcastStyle
+
     export DefaultArray,eachnondefault
     struct DefaultArray{T,N} <: AbstractArray{T,N}
         default::T
         size::NTuple{N,Int}
-        elements::Dict{NTuple{N,Int},T}
+        elements::Dict{Int,T}
     end
     import Base.similar
+    @inline IndexStyle(::Type{DefaultArray}) = IndexLinear()
+    @inline IndexStyle(::DefaultArray) = IndexLinear()
 
-
-    @propagate_inbounds function DefaultArray(default::T, size::NTuple{N,Int})  where {T,N}
-        DefaultArray(default, size, Dict{NTuple{N,Int},T}())
+    function DefaultArray(default::T, size::NTuple{N,Int})  where {T,N}
+        DefaultArray(default, size, Dict{Int,T}())
     end
     function DefaultArray(default,size::Int...)
         DefaultArray(default, size)
@@ -31,66 +35,42 @@ module DefaultArrays
     end
 
 
-    size(A::DefaultArray) = A.size
+    @inline size(A::DefaultArray) = A.size
 
     similar(A::DefaultArray, ::Type{T}, dims::Dims) where {T} = DefaultArray(convert(T,A.default), dims)
 
-    @inline function checkbounds(A::DefaultArray,I)
-        if length(I) != length(A.size) || (!all(1 .<= I .<= A.size))
-            throw(BoundsError)
-        end
+    @inline function getindex(A::DefaultArray, i::Int)
+        @boundscheck checkbounds(A,i)
+        get(A.elements, i, A.default)
     end
 
-    @inline getindex(A::DefaultArray{T,1}, i::Int) where T =  _cartesian_getindex(A, i)
-    @inline getindex(A::DefaultArray{T,N}, i::Int) where {T,N} =  _scalar_getindex(A, i)
-    @inline getindex(A::DefaultArray, I::Int...) =  _cartesian_getindex(A, I...)
-
-    @inline function _cartesian_getindex(A::DefaultArray, I::Int...)
-        @boundscheck checkbounds(A,I)
-        get(A.elements, I, A.default)
-    end
-    @inline function _scalar_getindex(A::DefaultArray,i::Int)
-        I=Tuple(CartesianIndices(A)[i])
-        _cartesian_getindex(A, I...)
-    end
-
-    @inline function _cartesian_setindex!(A::DefaultArray, v, I::Int...)
-        @boundscheck checkbounds(A,I)
-        if v == A.default && haskey(A.elements,I)
-            delete!(A.elements,I)
+    @inline function setindex!(A::DefaultArray, v, i::Int)
+        @boundscheck checkbounds(A,i)
+        if v == A.default && haskey(A.elements,i)
+            delete!(A.elements,i)
         else
-            A.elements[I] = v
+            A.elements[i] = v
         end
         v
     end
-    @inline function _scalar_setindex!(A::DefaultArray,v,i::Int)
-        I=Tuple(CartesianIndices(A)[i])
-        _cartesian_setindex!(A, v, I...)
-    end
-    @inline setindex!(A::DefaultArray{T,1},v, i::Int) where T =  _cartesian_setindex!(A,v, i)
-    @inline setindex!(A::DefaultArray{T,N},v, i::Int) where {T,N} =  _scalar_setindex!(A,v, i)
-    @inline setindex!(A::DefaultArray,v, I::Int...) =  _cartesian_setindex!(A,v, I...)
 
-
-    function eachnondefault(A::DefaultArray)
-        (CartesianIndex(x) for x in keys(A.elements) if A.elements[x]!=A.default)
+    @inline function eachnondefault(A::DefaultArray)
+        (i for i in keys(A.elements) if A.elements[i]!=A.default)
     end
 
-    import Base.BroadcastStyle
-    BroadcastStyle(::Type{<:DefaultArray{T}}) where {T} = Broadcast.ArrayStyle{DefaultArray{T}}()
+
+    @inline BroadcastStyle(::Type{<:DefaultArray{T}}) where {T} = Broadcast.ArrayStyle{DefaultArray{T}}()
     function similar(bc::Broadcast.Broadcasted{Broadcast.ArrayStyle{DefaultArray{T}}}, ::Type{ElType}) where {ElType,T}
         da = find_defaultarray(bc)
-        va,vb=promote(da.default,zero(ElType))
-        if typeof(va)==ElType
-            return DefaultArray(va,similar(Array{ElType}, axes(bc)))
-        end
-        return DefaultArray(zero(ElType),similar(Array{ElType}, axes(bc)))
+        va,_ =promote(da.default,zero(ElType))
+        gooddefault=ifelse(typeof(va)==ElType, va, zero(ElType))
+        return DefaultArray(gooddefault::ElType,similar(Array{ElType}, axes(bc)))
     end
 
 
-    find_defaultarray(bc::Base.Broadcast.Broadcasted) = find_defaultarray(bc.args)
-    find_defaultarray(args::Tuple) = find_defaultarray(find_defaultarray(args[1]), Base.tail(args))
-    find_defaultarray(x) = x
-    find_defaultarray(a::DefaultArray, rest) = a
-    find_defaultarray(::Any, rest) = find_defaultarray(rest)
+    @inline find_defaultarray(bc::Base.Broadcast.Broadcasted) = find_defaultarray(bc.args)
+    @inline find_defaultarray(args::Tuple) = find_defaultarray(find_defaultarray(args[1]), Base.tail(args))
+    @inline find_defaultarray(x) = x
+    @inline find_defaultarray(a::DefaultArray, rest) = a
+    @inline find_defaultarray(::Any, rest) = find_defaultarray(rest)
 end # module

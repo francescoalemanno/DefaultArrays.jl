@@ -55,7 +55,7 @@ module DefaultArrays
     end
 
     @inline function eachnondefault(A::DefaultArray)
-        (i for i in keys(A.elements) if A.elements[i]!=A.default)
+        @inbounds (i for i in eachindex(A.elements) if A.elements[i]!=A.default)
     end
 
 

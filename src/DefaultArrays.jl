@@ -46,8 +46,8 @@ module DefaultArrays
 
     @inline function setindex!(A::DefaultArray, v, i::Int)
         @boundscheck checkbounds(A,i)
-        if v == A.default && haskey(A.elements,i)
-            delete!(A.elements,i)
+        if v == A.default
+            haskey(A.elements,i) || delete!(A.elements,i)
         else
             A.elements[i] = v
         end

@@ -10,7 +10,7 @@ using DefaultArrays
     @test A[3]==A[1,2]
     A[4]=3.0
     @test A[4]==A[2,2]
-
+    @test all(collect(eachnondefault(A)).==[4, 3])
     B=DefaultArray(Inf,(3,))
     B[3]=2
     @test B[3]==2

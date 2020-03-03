@@ -13,7 +13,7 @@ module DefaultArrays
         elements::Dict{Int,T}
     end
     import Base.similar
-    @inline IndexStyle(::Type{DefaultArray}) = IndexLinear()
+
     @inline IndexStyle(::DefaultArray) = IndexLinear()
 
     function DefaultArray(default::T, size::NTuple{N,Int})  where {T,N}
@@ -31,7 +31,7 @@ module DefaultArrays
         DefaultArray(zero(eltype(A)),A)
     end
     function DefaultArray(A::DefaultArray)
-        DefaultArray(A.default,A)
+        A
     end
 
 
@@ -70,8 +70,9 @@ module DefaultArrays
 
 
     @inline find_defaultarray(bc::Base.Broadcast.Broadcasted) = find_defaultarray(bc.args)
+    @inline find_defaultarray(bc::Base.Broadcast.Extruded) = find_defaultarray(bc.x)
     @inline find_defaultarray(args::Tuple) = find_defaultarray(find_defaultarray(args[1]), Base.tail(args))
     @inline find_defaultarray(x) = x
     @inline find_defaultarray(a::DefaultArray, rest) = a
-    @inline find_defaultarray(::Any, rest) = find_defaultarray(rest)
+    @inline find_defaultarray(a::Any, rest) = find_defaultarray(rest)
 end # module

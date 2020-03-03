@@ -35,3 +35,14 @@ end
     @test typeof(M)==DefaultArray{Float64,2}
     @test all((DefaultArray(0.0,2,2).+true).==1)
 end
+
+
+
+@testset "Various Constructors" begin
+    A=[1 1;0 1]
+    M=DefaultArray(A)
+    @test all(A.==M)
+    @test M==DefaultArray(M)
+    ugly=DefaultArray(0,(2,2)) .+ Any[1 1;2 2]
+    @test repr((typeof(ugly),ugly))=="(DefaultArray{Int64,2}, [1 1; 2 2])"
+end

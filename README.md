@@ -2,6 +2,10 @@
 
 [![Build Status](https://travis-ci.org/francescoalemanno/DefaultArrays.jl.svg?branch=master)](https://travis-ci.org/francescoalemanno/DefaultArrays.jl)
 
+[![codecov](https://codecov.io/gh/francescoalemanno/DefaultArrays.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/francescoalemanno/DefaultArrays.jl)
+
+[![Coverage Status](https://coveralls.io/repos/github/francescoalemanno/DefaultArrays.jl/badge.svg?branch=master)](https://coveralls.io/github/francescoalemanno/DefaultArrays.jl?branch=master)
+
 Julia array type supporting a default value, useful for storing very sparse information in a space efficient manner, the internal design uses "Dict" for storage
 
 ### Installation:

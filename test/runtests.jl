@@ -2,7 +2,6 @@ using Test
 using DefaultArrays
 using LinearAlgebra
 @testset "Basic Tests" begin
-
     A=DefaultArray(Inf,(2,3))
     A[1,2]=2
     @test maximum(A)==Inf
@@ -11,6 +10,7 @@ using LinearAlgebra
     A[4]=3.0
     @test A[4]==A[2,2]
     @test all(collect(eachnondefault(A)).==[4, 3])
+    @test collect(eachnondefault(A,IndexCartesian())) == [CartesianIndex(2, 2), CartesianIndex(1, 2)]
     B=DefaultArray(Inf,(3,))
     B[3]=2
     @test B[3]==2

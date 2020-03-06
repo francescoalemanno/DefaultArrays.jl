@@ -9,10 +9,9 @@
 Julia array type supporting a default value, useful for storing very sparse information in a space efficient manner, the internal design uses "Dict" for storage
 
 ### Installation:
-Since this package is not registered (at the moment) do:
+Since this package is now registered do:
 ```julia
-using Pkg
-pkg"add https://github.com/francescoalemanno/DefaultArrays.jl.git";
+using Pkg; pkg"add DefaultArrays";
 ```
 
 ### Usage:

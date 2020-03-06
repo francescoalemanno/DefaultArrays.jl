@@ -31,6 +31,4 @@ sum(Q)  #->  some random value
 length(Q.elements) #-> MUCH less space occupied than 100*100 = 10000
 ```
 
-
-
 original idea of Tamas K. Papp @ https://github.com/tpapp

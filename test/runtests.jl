@@ -11,6 +11,10 @@ using LinearAlgebra
     @test A[4]==A[2,2]
     @test all(collect(eachnondefault(A)).==[4, 3])
     @test collect(eachnondefault(A,IndexCartesian())) == [CartesianIndex(2, 2), CartesianIndex(1, 2)]
+    l1=length(eachnondefault(A)|>collect)
+    A[1,2]=Inf
+    l2=length(eachnondefault(A)|>collect)
+    @test l1>l2
     B=DefaultArray(Inf,(3,))
     B[3]=2
     @test B[3]==2
